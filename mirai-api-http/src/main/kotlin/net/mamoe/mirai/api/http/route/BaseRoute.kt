@@ -48,7 +48,7 @@ fun Application.mirai() {
         method(HttpMethod.Options)
         allowNonSimpleContentTypes = true
         maxAgeInSeconds = 1.toDuration(DurationUnit.DAYS).inSeconds.toLong()
-        Setting.cors.forEach {
+        Setting.global.cors.forEach {
             host(it, schemes = listOf("http", "https"))
         }
     }

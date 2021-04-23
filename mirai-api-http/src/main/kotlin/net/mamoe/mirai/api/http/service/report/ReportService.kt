@@ -33,7 +33,7 @@ class ReportService(
     /**
      * 心跳配置
      */
-    private val reportConfig get() = Setting.report
+    private val reportConfig get() = Setting.global.report
 
     /**
      * 事件监听器

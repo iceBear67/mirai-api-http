@@ -18,7 +18,7 @@ import net.mamoe.mirai.api.http.data.StateCode
 import net.mamoe.mirai.api.http.data.common.StringMapRestfulResult
 import net.mamoe.mirai.api.http.data.common.VerifyDTO
 
-private val mahVersion = "todo"
+private val mahVersion = "1.11.0-STANDALONE-0.1.0"
 
 /**
  * 配置路由

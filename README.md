@@ -30,11 +30,27 @@ Mirai HTTP API (standalone)
 使用 `java jar ./mirai-api-http-XXX` 运行 mah  
 此版本MAH没有 commandroute.
 
+### 关于 Standalone 版的额外细节
+1. 可以通过 `-Dqq=XXX -Dpwd=xxx` 或环境变量指定 QQ 号和密码。
+2. 用户密码配置文件通常储存为 `user.yml`
+3. device.json 是设备信息，可以在 https://ryoii.github.io/mirai-devicejs-generator/ 在线生成，通常不需要管它
+4. 协议默认使用 Android Pad，可以在 `user.yml` 里面修改。[选项](https://github.com/mamoe/mirai/blob/1088b1262189e19ddae51a955aee5a0a27b93295/mirai-core-api/src/commonMain/kotlin/utils/BotConfiguration.kt#L194)
+5. 通过 Ctrl+C 关闭机器人
+
+目前还在开发中 有问题请反馈到 Issue。
+
 ## 开始使用
 
-1. 编辑`setting.yml`配置文件 (没有则自行创建)
+1. 编辑`user.yml`配置文件 (没有则自行创建)
 1. 启动 MAH
 1. 记录日志中出现的`authKey`
+
+#### user.yml模板
+```yaml
+qq: 123456
+pwd: 密码
+protocol: 协议，可选ANDROID_PAD,ANDROID_PHONE,ANDROID_WATCH 具体看https://github.com/mamoe/mirai/blob/1088b1262189e19ddae51a955aee5a0a27b93295/mirai-core-api/src/commonMain/kotlin/utils/BotConfiguration.kt#L194
+```
 
 #### setting.yml模板
 

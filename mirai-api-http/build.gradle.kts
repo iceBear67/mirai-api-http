@@ -35,8 +35,7 @@ kotlin {
             api(ktor("server-cio"))
             api(ktor("http-jvm"))
             api(ktor("websockets"))
-            api("org.yaml:snakeyaml:1.25")
-
+            implementation("net.mamoe.yamlkt:yamlkt:0.9.0")
             implementation(ktor("server-core"))
             implementation(ktor("http"))
         }
@@ -47,27 +46,28 @@ project.version = httpVersion
 
 description = "Mirai HTTP API plugin"
 
-internal val EXCLUDED_FILES = listOf(
+/*internal val EXCLUDED_FILES = listOf(
     "kotlin-stdlib-.*",
     "kotlin-reflect-.*",
     "kotlinx-serialization-json.*",
     "kotlinx-coroutines.*",
     "kotlinx-serialization-core.*",
     "slf4j-api.*"
-).map { "^$it\$".toRegex() }
+).map { "^$it\$".toRegex() }*/
 
 val compileKotlin: KotlinCompile by tasks
 
 compileKotlin.kotlinOptions.jvmTarget="1.8"
-
-val shadowJvmJar by tasks.creating(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) sd@{
-    this.manifest {
-        this.attributes(
-            "Main-Class" to "net.mamoe.mirai.api.http.HttpApi"
-        )
-    }
-    this.exclude { elm ->
-        EXCLUDED_FILES.any { it.matches(elm.path) }
+tasks {
+    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+        this.manifest {
+            this.attributes(
+                "Main-Class" to "net.mamoe.mirai.api.http.HttpApi"
+            )
+        }
+     /*   this.exclude { elm ->
+            EXCLUDED_FILES.any { it.matches(elm.path) }
+        }*/
     }
 }
 tasks.create("buildCiJar", Jar::class) {

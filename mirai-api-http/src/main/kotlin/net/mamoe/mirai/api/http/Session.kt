@@ -122,8 +122,8 @@ class AuthedSession internal constructor(val bot: Bot, originKey: String, corout
     val cacheQueue = CacheQueue()
     val config = Config(
         session = this,
-        cacheSize = Setting.cacheSize,
-        enableWebsocket = Setting.enableWebsocket
+        cacheSize = Setting.global.cacheSize,
+        enableWebsocket = Setting.global.enableWebsocket
     )
     private var _listener: Listener<BotEvent>
     private val _cache: Listener<MessageEvent>

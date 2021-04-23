@@ -9,16 +9,17 @@
 
 package net.mamoe.mirai.api.http
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.api.http.MiraiHttpAPIServer.logger
 import net.mamoe.mirai.api.http.config.Setting
 import net.mamoe.mirai.api.http.service.MiraiApiHttpServices
-import org.yaml.snakeyaml.Yaml
+import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.yamlkt.Yaml
 import java.io.File
 
 internal typealias CommandSubscriber = suspend (String, Long, Long, List<String>) -> Unit
@@ -26,33 +27,51 @@ internal typealias CommandSubscriber = suspend (String, Long, Long, List<String>
 object HttpApi{
     var services: MiraiApiHttpServices = MiraiApiHttpServices()
     val dataFolder = File(".")
-    val yaml = Yaml()
+    var bot: Bot? = null
     @JvmStatic
-    fun main(args: Array<String>): Unit = runBlocking {
-        logger.info("Mirai API Http Standalone Edition LOADING")
-        val configuration = File("user.yml")
-        if(!configuration.exists()){
-            // init and quit
-            val user=UserConfiguration(2333333,"your password here");
-            configuration.writeText(yaml.dump(user))
-            logger.warning("请前往 user.yml 进行用户信息配置...")
-            System.exit(0);
+    fun main(args: Array<String>){
+        Runtime.getRuntime().addShutdownHook(Thread{
+            if (bot!=null){
+                logger.info("Shutting down....")
+                bot!!.close()
+            }
+        });
+        runBlocking {
+            logger.info("Mirai API Http Standalone Edition LOADING")
+            val qq = System.getProperty("qq")
+            val pwd = System.getProperty("pwd")
+            lateinit var user: UserConfiguration
+            if(qq != null && pwd !=null){
+                user = UserConfiguration(qq.toLong(),pwd)
+            }else {
+                val configuration = File("user.yml")
+                if (!configuration.exists()) {
+                    // init and quit
+                    user = UserConfiguration(2333333, "your password here");
+                    configuration.writeText(Yaml.encodeToString(user))
+                    logger.warning("请前往 user.yml 进行用户信息配置...")
+                    System.exit(0);
+                }
+                user = Yaml.decodeFromString(UserConfiguration.serializer(), configuration.readText())
+            }
+            kotlin.runCatching {
+                BotFactory.newBot(user.qq,user.pwd){
+                    fileBasedDeviceInfo("device.json")
+                    protocol = user.protocol
+                }.alsoLogin()
+            }.onSuccess {
+                bot=it
+            }.onFailure {
+                logger.error(it)
+                logger.error("FAILED TO LOGIN")
+            }
+            onEnable()
         }
-        val user = yaml.loadAs(configuration.readText(),UserConfiguration::class.java)
-        kotlin.runCatching {
-            BotFactory.newBot(user.qq,user.pwd).alsoLogin()
-        }.onSuccess {
-            logger.info("Login successsful! ${it.nick}")
-        }.onFailure {
-            logger.error(it)
-            logger.error("FAILED TO LOGIN")
-        }
-        onEnable()
     }
     fun onEnable() {
-        Setting.reload()
+        Setting.global.reload()
 
-        with(Setting) {
+        with(Setting.global) {
 
             if (authKey.startsWith("INITKEY")) {
                 logger.warning("USING INITIAL KEY, please edit the key")
