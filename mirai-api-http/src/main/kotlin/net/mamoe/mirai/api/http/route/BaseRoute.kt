@@ -37,6 +37,8 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
 
+val logger = MiraiHttpAPIServer.logger
+
 @OptIn(ExperimentalTime::class)
 fun Application.mirai() {
     install(DefaultHeaders)
@@ -51,7 +53,6 @@ fun Application.mirai() {
         }
     }
     authModule()
-    commandModule()
     messageModule()
     eventRouteModule()
     infoModule()
@@ -206,7 +207,7 @@ internal inline fun Route.intercept(crossinline blk: suspend PipelineContext<Uni
         } catch (e: IllegalStateException) {  // 权限不足: issue #289
             call.respondStateCode(StateCode(400, e.message.toString()), HttpStatusCode.BadRequest)
         } catch (e: Throwable) {
-            HttpApiPluginBase.logger.error(e)
+            e.printStackTrace()
             call.respond(HttpStatusCode.InternalServerError, e.message!!)
         }
     }

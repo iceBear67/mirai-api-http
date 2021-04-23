@@ -9,19 +9,20 @@
 
 package net.mamoe.mirai.api.http.service.heartbeat
 
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import net.mamoe.mirai.api.http.MiraiHttpAPIServer.logger
 import net.mamoe.mirai.api.http.config.Setting
 import net.mamoe.mirai.api.http.service.MiraiApiHttpService
 import net.mamoe.mirai.api.http.util.HttpClient
-import net.mamoe.mirai.console.plugin.Plugin
-import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
+
 import java.util.*
 import kotlin.concurrent.timerTask
 
 /**
  * 心跳服务
  */
-class HeartBeatService(override val console: JvmPlugin) : MiraiApiHttpService {
+class HeartBeatService : MiraiApiHttpService {
 
     val config get() = Setting.heartbeat
 
@@ -36,20 +37,20 @@ class HeartBeatService(override val console: JvmPlugin) : MiraiApiHttpService {
     override fun onEnable() {
         timer.schedule(timerTask {
             if (config.enable) {
-                console.launch {
+                GlobalScope.launch {
                     pingAllDestinations()
                 }
             }
         }, config.delay, config.period)
 
-        console.logger.info("心跳模块启用状态: ${config.enable}")
+        logger.info("心跳模块启用状态: ${config.enable}")
     }
 
     override fun onDisable() {
         timer.cancel()
         timer.purge()
 
-        console.logger.info("心跳模块已禁用")
+        logger.info("心跳模块已禁用")
     }
 
     /**
@@ -68,7 +69,7 @@ class HeartBeatService(override val console: JvmPlugin) : MiraiApiHttpService {
         try {
             HttpClient.post(destination, config.extraBody, config.extraHeaders)
         } catch (e: Exception) {
-            console.logger.error("发送${destination}心跳失败: ${e.message}")
+            logger.error("发送${destination}心跳失败: ${e.message}")
         }
     }
 }

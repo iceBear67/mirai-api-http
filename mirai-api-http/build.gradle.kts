@@ -1,7 +1,8 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("kotlinx-serialization")
+    id("com.github.johnrengelman.shadow") version "6.1.0"
     kotlin("jvm")
-    id("net.mamoe.mirai-console") version "2.5.2"
 }
 
 val httpVersion: String by rootProject.ext
@@ -15,7 +16,7 @@ fun kotlinx(id: String, version: String) =
 
 fun ktor(id: String, version: String = this@Build_gradle.ktorVersion) = "io.ktor:ktor-$id:$version"
 
-
+val miraiVersion = "2.5.2"
 kotlin {
     sourceSets["test"].apply {
         dependencies {
@@ -29,8 +30,8 @@ kotlin {
 
         dependencies {
             api(kotlinx("serialization-json", serializationVersion))
-            implementation("net.mamoe:mirai-core-utils:${mirai.coreVersion}")
-
+            implementation("net.mamoe:mirai-core-utils:${miraiVersion}")
+            api("net.mamoe:mirai-core:$miraiVersion")
             api(ktor("server-cio"))
             api(ktor("http-jvm"))
             api(ktor("websockets"))
@@ -55,16 +56,18 @@ internal val EXCLUDED_FILES = listOf(
     "slf4j-api.*"
 ).map { "^$it\$".toRegex() }
 
-mirai {
-    this.configureShadow {
-        exclude { elm ->
-            EXCLUDED_FILES.any { it.matches(elm.path) }
-        }
+val compileKotlin: KotlinCompile by tasks
+
+compileKotlin.kotlinOptions.jvmTarget="1.8"
+
+val shadowJvmJar by tasks.creating(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) sd@{
+    this.manifest {
+        this.attributes(
+            "Main-Class" to "net.mamoe.mirai.api.http.HttpApi"
+        )
     }
-    publishing {
-        repo = "mirai"
-        packageName = "mirai-api-http"
-        override = true
+    this.exclude { elm ->
+        EXCLUDED_FILES.any { it.matches(elm.path) }
     }
 }
 tasks.create("buildCiJar", Jar::class) {

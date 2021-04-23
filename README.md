@@ -17,7 +17,8 @@ Mirai 是一个在全平台下运行，提供 QQ Android 和 TIM PC 协议支持
 </div>
 
 # mirai-api-http
-Mirai HTTP API (console) plugin
+Mirai HTTP API (standalone)  
+~~代码力渣勿吐槽~~
 
 <b>Mirai-API-http插件 提供HTTP API供所有语言使用mirai</b>
 
@@ -25,21 +26,14 @@ Mirai HTTP API (console) plugin
 
 ## 安装`mirai-api-http`
 
-### 使用 [Mirai Console Loader](https://github.com/iTXTech/mirai-console-loader) 安装`mirai-api-http`
-
-* `MCL` 支持自动更新插件，支持设置插件更新频道等功能
-
-`.\mcl --update-package net.mamoe:mirai-api-http --channel stable --type plugin`
-
-### 手动安装`mirai-api-http`
-
-1. 运行 [Mirai Console](https://github.com/mamoe/mirai-console) 生成plugins文件夹
-1. 从 [Releases](https://github.com/project-mirai/mirai-api-http/releases) 下载`jar`并将其放入`plugins`文件夹中
+从 Releases 下载最新版本的 mah  
+使用 `java jar ./mirai-api-http-XXX` 运行 mah  
+此版本MAH没有 commandroute.
 
 ## 开始使用
 
-1. 编辑`config/MiraiApiHttp/setting.yml`配置文件 (没有则自行创建)
-1. 启动 [Mirai Console](https://github.com/mamoe/mirai-console)
+1. 编辑`setting.yml`配置文件 (没有则自行创建)
+1. 启动 MAH
 1. 记录日志中出现的`authKey`
 
 #### setting.yml模板

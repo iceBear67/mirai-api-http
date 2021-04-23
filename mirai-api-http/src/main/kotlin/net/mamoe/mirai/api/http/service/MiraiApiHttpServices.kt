@@ -11,14 +11,12 @@ package net.mamoe.mirai.api.http.service
 
 import net.mamoe.mirai.api.http.service.heartbeat.HeartBeatService
 import net.mamoe.mirai.api.http.service.report.ReportService
-import net.mamoe.mirai.console.plugin.Plugin
-import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 
-class MiraiApiHttpServices(override val console: JvmPlugin) : MiraiApiHttpService {
+class MiraiApiHttpServices() : MiraiApiHttpService {
     private val services: List<MiraiApiHttpService> = listOf(
-        HeartBeatService(console),
-        ReportService(console)
+        HeartBeatService(),
+        ReportService()
     )
 
     override fun onLoad() {

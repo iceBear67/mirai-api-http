@@ -9,14 +9,15 @@
 
 package net.mamoe.mirai.api.http.service.report
 
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import net.mamoe.mirai.api.http.MiraiHttpAPIServer.logger
 import net.mamoe.mirai.api.http.config.Setting
 import net.mamoe.mirai.api.http.data.common.IgnoreEventDTO
 import net.mamoe.mirai.api.http.data.common.toDTO
 import net.mamoe.mirai.api.http.service.MiraiApiHttpService
 import net.mamoe.mirai.api.http.util.HttpClient
 import net.mamoe.mirai.api.http.util.toJson
-import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.*
@@ -27,10 +28,6 @@ import net.mamoe.mirai.utils.error
  * 上报服务
  */
 class ReportService(
-    /**
-     * 插件对象
-     */
-    override val console: JvmPlugin
 ) : MiraiApiHttpService {
 
     /**
@@ -79,20 +76,20 @@ class ReportService(
                 }
         }
 
-        console.logger.info("上报模块启用状态: ${reportConfig.enable}")
+        logger.info("上报模块启用状态: ${reportConfig.enable}")
     }
 
     override fun onDisable() {
         subscription?.complete()
 
-        console.logger.info("上报模块已禁用")
+        logger.info("上报模块已禁用")
     }
 
     /**
      * 上报到所有目标地址
      */
     private fun reportAllDestinations(json: String, botId: Long) {
-        console.launch {
+        GlobalScope.launch {
             reportConfig.destinations.forEach {
                 report(it, json, botId)
             }
@@ -106,7 +103,7 @@ class ReportService(
         try {
             HttpClient.post(destination, json, reportConfig.extraHeaders, botId)
         } catch (e: Exception) {
-            console.logger.error { "上报${destination}失败: ${e.message}" }
+            logger.error { "上报${destination}失败: ${e.message}" }
         }
     }
 }

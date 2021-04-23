@@ -17,8 +17,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.api.http.route.mirai
-import net.mamoe.mirai.console.plugin.PluginManager
-import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.description
 import net.mamoe.mirai.utils.MiraiLogger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -58,10 +56,7 @@ object MiraiHttpAPIServer : CoroutineScope {
 
             val err = System.err
 
-            val logger = if (PluginManager.plugins.any {
-                    // plugin mode
-                    it.description.id == "net.mamoe.mirai.mirai-slf4j-bridge"
-                } || runCatching {
+            val logger = if (runCatching {
                     // library mode
                     Class.forName(
                         "org.slf4j.impl.StaticLoggerBinder",

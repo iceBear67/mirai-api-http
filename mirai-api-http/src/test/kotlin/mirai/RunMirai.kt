@@ -1,7 +1,7 @@
 package mirai
 
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.api.http.HttpApiPluginBase
+import net.mamoe.mirai.api.http.HttpApi
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.enable
 import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.load
@@ -17,8 +17,8 @@ object RunMirai {
     fun main(args: Array<String>) {
         MiraiConsoleTerminalLoader.startAsDaemon()
 
-        HttpApiPluginBase.load()
-        HttpApiPluginBase.enable()
+        HttpApi.load()
+        HttpApi.enable()
 
         runBlocking { MiraiConsole.job.join() }
     }

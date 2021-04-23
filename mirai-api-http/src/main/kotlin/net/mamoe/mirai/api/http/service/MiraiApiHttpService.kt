@@ -9,18 +9,10 @@
 
 package net.mamoe.mirai.api.http.service
 
-import net.mamoe.mirai.console.plugin.Plugin
-
 /**
  * MiraiApiHttp抽象服务
  */
 interface MiraiApiHttpService {
-
-    /**
-     * Mirai Console
-     */
-    val console: Plugin
-
     /**
      * 对应MiraiConsole生命周期
      */

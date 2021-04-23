@@ -1,19 +1,18 @@
 package net.mamoe.mirai.api.http.config
 
 import kotlinx.serialization.Serializable
-import net.mamoe.mirai.api.http.HttpApiPluginBase
+import net.mamoe.mirai.api.http.HttpApi
 import net.mamoe.mirai.api.http.generateSessionKey
-import net.mamoe.mirai.console.data.PluginConfig
-import net.mamoe.mirai.console.data.ReadOnlyPluginData
-import net.mamoe.mirai.console.data.value
+import org.yaml.snakeyaml.Yaml
+import java.io.File
 
 typealias Destination = String
 typealias Destinations = List<Destination>
 
 /**
- * Mirai Api Http 的配置文件类，它应该是单例，并且在 [HttpApiPluginBase.onEnable] 时被初始化
+ * Mirai Api Http 的配置文件类，它应该是单例，并且在 [HttpApi.onEnable] 时被初始化
  */
-object Setting : ReadOnlyPluginData("setting"), PluginConfig {
+object Setting {
     /**
      * 上报子消息配置
      *
@@ -64,41 +63,52 @@ object Setting : ReadOnlyPluginData("setting"), PluginConfig {
         val extraHeaders: Map<String, String> = emptyMap(),
     )
 
-    val cors: List<String> by value(listOf("*"))
+    var cors: List<String> = listOf("*")
 
     /**
      * mirai api http 所使用的地址，默认为 0.0.0.0
      */
-    val host: String by value("0.0.0.0")
+    var host: String = "0.0.0.0"
 
     /**
      * mirai api http 所使用的端口，默认为 8080
      */
-    val port: Int by value(8080)
+    var port: Int  = 8080
 
     /**
      * 认证密钥，默认为随机
      */
-    val authKey: String by value("INITKEY" + generateSessionKey())
+    var authKey: String = "INITKEY" + generateSessionKey()
 
     /**
      * FIXME: 什么的缓存区
      * 缓存区大小，默认为 4096
      */
-    val cacheSize: Int by value(4096)
+    var cacheSize: Int = 4096
 
     /**
      * 是否启用 websocket 服务
      */
-    val enableWebsocket: Boolean by value(false)
+    var enableWebsocket: Boolean = false
 
     /**
      * 上报服务配置
      */
-    val report: Report by value(Report())
+    var report: Report = Report()
 
     /**
      * 心跳服务配置
      */
-    val heartbeat: HeartBeat by value(HeartBeat())
+    var heartbeat: HeartBeat = HeartBeat()
+    fun reload(){
+        val a= Yaml().loadAs(File("setting.yml").readText(),Setting::class.java)
+        authKey=a.authKey
+        cacheSize=a.cacheSize
+        cors=a.cors
+        enableWebsocket=a.enableWebsocket
+        heartbeat=a.heartbeat
+        host=a.host
+        port=a.port
+        report=a.report
+    }
 }

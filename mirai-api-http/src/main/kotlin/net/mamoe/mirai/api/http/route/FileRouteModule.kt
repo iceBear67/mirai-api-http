@@ -12,7 +12,7 @@ import io.ktor.application.*
 import io.ktor.routing.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
-import net.mamoe.mirai.api.http.HttpApiPluginBase
+import net.mamoe.mirai.api.http.HttpApi
 import net.mamoe.mirai.api.http.data.StateCode
 import net.mamoe.mirai.api.http.data.common.DTO
 import net.mamoe.mirai.api.http.data.common.VerifyDTO
@@ -118,7 +118,7 @@ fun Application.fileRouteModule() {
             val path = parts.value("path")
             val file = parts.file("file") ?: error("file不能为空")
             var messageChain: MessageChain
-            val newFile = HttpApiPluginBase.saveFileAsync(
+            val newFile = HttpApi.saveFileAsync(
                 file.originalFileName ?: generateSessionKey(), file.provider().readBytes()
             )
             when (type) {

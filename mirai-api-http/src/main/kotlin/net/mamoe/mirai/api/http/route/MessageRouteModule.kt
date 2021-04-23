@@ -15,7 +15,7 @@ import io.ktor.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.api.http.AuthedSession
-import net.mamoe.mirai.api.http.HttpApiPluginBase
+import net.mamoe.mirai.api.http.HttpApi
 import net.mamoe.mirai.api.http.data.IllegalAccessException
 import net.mamoe.mirai.api.http.data.IllegalParamException
 import net.mamoe.mirai.api.http.data.StateCode
@@ -247,7 +247,7 @@ fun Application.messageModule() {
 
                 val image = streamProvider().use {
                     // originalFileName assert not null
-                    val newFile = HttpApiPluginBase.saveImageAsync(
+                    val newFile = HttpApi.saveImageAsync(
                         originalFileName ?: generateSessionKey(), it.readBytes()
                     )
 
@@ -285,7 +285,7 @@ fun Application.messageModule() {
 
                 val voice = streamProvider().use { inputStream ->
                     // originalFileName assert not null
-                    val newFile = HttpApiPluginBase.saveVoiceAsync(
+                    val newFile = HttpApi.saveVoiceAsync(
                         originalFileName ?: generateSessionKey(), inputStream.readBytes()
                     )
 

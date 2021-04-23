@@ -9,24 +9,47 @@
 
 package net.mamoe.mirai.api.http
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.BotFactory
+import net.mamoe.mirai.alsoLogin
+import net.mamoe.mirai.api.http.MiraiHttpAPIServer.logger
 import net.mamoe.mirai.api.http.config.Setting
 import net.mamoe.mirai.api.http.service.MiraiApiHttpServices
-import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
-import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 
 internal typealias CommandSubscriber = suspend (String, Long, Long, List<String>) -> Unit
 
-object HttpApiPluginBase : KotlinPlugin(
-    JvmPluginDescription(id = "net.mamoe.mirai-api-http", version = "1.11.0") {
-        author("ryoii")
-        info("Mirai HTTP API Server Plugin")
+object HttpApi{
+    var services: MiraiApiHttpServices = MiraiApiHttpServices()
+    val dataFolder = File(".")
+    val yaml = Yaml()
+    @JvmStatic
+    fun main(args: Array<String>): Unit = runBlocking {
+        logger.info("Mirai API Http Standalone Edition LOADING")
+        val configuration = File("user.yml")
+        if(!configuration.exists()){
+            // init and quit
+            val user=UserConfiguration(2333333,"your password here");
+            configuration.writeText(yaml.dump(user))
+            logger.warning("请前往 user.yml 进行用户信息配置...")
+            System.exit(0);
+        }
+        val user = yaml.loadAs(configuration.readText(),UserConfiguration::class.java)
+        kotlin.runCatching {
+            BotFactory.newBot(user.qq,user.pwd).alsoLogin()
+        }.onSuccess {
+            logger.info("Login successsful! ${it.nick}")
+        }.onFailure {
+            logger.error(it)
+            logger.error("FAILED TO LOGIN")
+        }
+        onEnable()
     }
-) {
-    var services: MiraiApiHttpServices = MiraiApiHttpServices(this)
-
-    override fun onEnable() {
+    fun onEnable() {
         Setting.reload()
 
         with(Setting) {
@@ -44,7 +67,7 @@ object HttpApiPluginBase : KotlinPlugin(
         }
     }
 
-    override fun onDisable() {
+    fun onDisable() {
         MiraiHttpAPIServer.stop()
 
         services.onDisable()
@@ -57,56 +80,12 @@ object HttpApiPluginBase : KotlinPlugin(
 
     internal fun unSubscribeCommand(subscriber: CommandSubscriber) = subscribers.remove(subscriber)
 
-    // TODO: 解决Http-api插件卸载后，注册的command将失效
-    internal fun registerCommand(
-        names: Array<out String>,
-        description: String,
-        usage: String,
-    ) {
-//        CommandManager.INSTANCE.run {
-//            object : SimpleCommand(HttpApiPluginBase, *names, description = description) {
-//                override val usage: String = usage
-//
-//                @Handler
-//                suspend fun onCommand(target: User, message: String) {
-//                    // TODO
-//                }
-//            }
-//        }
-
-        /* registerCommand {
-        this.name = name
-        this.alias = alias
-        this.description = description
-        this.usage = usage
-
-        this.onCommand {
-                // do nothing
-                true
-            }
-        }*/
-    }
-
-//    override suspend fun onCommand(command: Command, sender: CommandSender, args: List<String>) {
-//        launch {
-//            val (from: Long, group: Long) = when (sender) {
-//                is MemberCommandSender -> sender.user.id to sender.user.id
-//                is FriendCommandSender -> sender.user.id to 0L
-//                else -> 0L to 0L // 考虑保留对其他Sender类型的扩展，先统一默认为ConsoleSender
-//            }
-//
-//            subscribers.forEach {
-//                it(command.names.first(), from, group, args)
-//            }
-//        }
-//    }
-
     private val imageFold: File = File(dataFolder, "images").apply { mkdirs() }
 
     internal fun image(imageName: String) = File(imageFold, imageName)
 
     fun saveImageAsync(name: String, data: ByteArray) =
-        async {
+        GlobalScope.async { //不会改...
             image(name).apply { writeBytes(data) }
         }
 
@@ -115,7 +94,7 @@ object HttpApiPluginBase : KotlinPlugin(
     internal fun voice(voiceName: String) = File(voiceFold, voiceName)
 
     fun saveVoiceAsync(name: String, data: ByteArray) =
-        async {
+        GlobalScope.async {
             voice(name).apply { writeBytes(data) }
         }
 
@@ -124,7 +103,7 @@ object HttpApiPluginBase : KotlinPlugin(
     internal fun file(fileName: String) = File(fileFold, fileName)
 
     fun saveFileAsync(name: String, data: ByteArray) =
-        async {
+        GlobalScope.async {
             file(name).apply { writeBytes(data) }
         }
 

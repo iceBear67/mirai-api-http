@@ -13,14 +13,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.mamoe.mirai.api.http.HttpApiPluginBase
+import net.mamoe.mirai.api.http.HttpApi
 import net.mamoe.mirai.api.http.util.FaceMap
 import net.mamoe.mirai.api.http.util.PokeMap
 import net.mamoe.mirai.api.http.util.toHexArray
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.event.events.*
-import net.mamoe.mirai.message.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
@@ -268,7 +267,7 @@ suspend fun MessageDTO.toMessage(contact: Contact): Message? = when (this) {
     is ImageDTO -> when {
         !imageId.isNullOrBlank() -> Image(imageId)
         !url.isNullOrBlank() -> withContext(Dispatchers.IO) { URL(url).openStream().uploadAsImage(contact) }
-        !path.isNullOrBlank() -> with(HttpApiPluginBase.image(path)) {
+        !path.isNullOrBlank() -> with(HttpApi.image(path)) {
             if (exists()) {
                 uploadAsImage(contact)
             } else throw NoSuchFileException(this)
@@ -278,7 +277,7 @@ suspend fun MessageDTO.toMessage(contact: Contact): Message? = when (this) {
     is FlashImageDTO -> when {
         !imageId.isNullOrBlank() -> Image(imageId)
         !url.isNullOrBlank() -> withContext(Dispatchers.IO) { URL(url).openStream().uploadAsImage(contact) }
-        !path.isNullOrBlank() -> with(HttpApiPluginBase.image(path)) {
+        !path.isNullOrBlank() -> with(HttpApi.image(path)) {
             if (exists()) {
                 uploadAsImage(contact)
             } else throw NoSuchFileException(this)
@@ -304,7 +303,7 @@ suspend fun MessageDTO.toMessage(contact: Contact): Message? = when (this) {
         contact !is Group -> null
         !voiceId.isNullOrBlank() -> Voice(voiceId, voiceId.substringBefore(".").toHexArray(), 0, 0, "")
         !url.isNullOrBlank() -> withContext(Dispatchers.IO) { URL(url).openStream().toExternalResource().uploadAsVoice(contact) }
-        !path.isNullOrBlank() -> with(HttpApiPluginBase.voice(path)) {
+        !path.isNullOrBlank() -> with(HttpApi.voice(path)) {
             if (exists()) {
                 inputStream().toExternalResource().uploadAsVoice(contact)
             } else throw NoSuchFileException(this)

@@ -13,19 +13,12 @@ import io.ktor.application.*
 import io.ktor.routing.*
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.api.http.AuthedSession
-import net.mamoe.mirai.api.http.HttpApiPluginBase
+import net.mamoe.mirai.api.http.HttpApi
 import net.mamoe.mirai.api.http.data.StateCode
 import net.mamoe.mirai.api.http.data.common.StringMapRestfulResult
 import net.mamoe.mirai.api.http.data.common.VerifyDTO
-import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
-import net.mamoe.mirai.console.plugin.version
-import kotlin.reflect.full.memberProperties
 
-private val mahVersion by lazy {
-    val desc = HttpApiPluginBase.description
-    JvmPluginDescription::class.memberProperties.first { it.name == "version" }
-        .get(desc).toString()
-}
+private val mahVersion = "todo"
 
 /**
  * 配置路由
