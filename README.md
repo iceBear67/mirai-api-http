@@ -37,7 +37,8 @@ Mirai HTTP API (standalone)
 4. 协议默认使用 Android Pad，可以在 `user.yml` 里面修改。[选项](https://github.com/mamoe/mirai/blob/1088b1262189e19ddae51a955aee5a0a27b93295/mirai-core-api/src/commonMain/kotlin/utils/BotConfiguration.kt#L194)
 5. 通过 Ctrl+C 关闭机器人
 
-目前还在开发中 有问题请反馈到 Issue。
+可能会有潜在的小问题  
+目前还在开发中 有问题请反馈到 Issue。  
 
 ## 开始使用
 
